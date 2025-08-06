@@ -81,8 +81,9 @@ def test_database_connection():
         from db.session import engine
         
         # Testa conexão
+        from sqlalchemy import text
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
             print("✅ Conexão com banco de dados estabelecida")
             
         return True

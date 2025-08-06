@@ -2,7 +2,7 @@ import os
 import logging
 from telegram.ext import Application, CommandHandler
 from dotenv import load_dotenv
-from handlers import start_command, habit_command, stats_command
+from .handlers import start_command, habit_command, stats_command
 from db.session import init_db
 from telegram import Update
 
