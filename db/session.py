@@ -1,7 +1,6 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.pool import StaticPool
 from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente
@@ -10,21 +9,17 @@ load_dotenv()
 # Configuração da URL do banco de dados
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Se não estiver configurado, usa SQLite para testes
+# Se não estiver configurado, usa SQLite local
 if not DATABASE_URL:
-    DATABASE_URL = "sqlite:///./test.db"
-    print("⚠️ DATABASE_URL não configurada, usando SQLite para testes")
+    DATABASE_URL = "sqlite:///./habit_bot.db"
+    print("📁 Usando SQLite local: habit_bot.db")
 
 # Cria o engine do SQLAlchemy
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,
     echo=False,  # Set to True para debug SQL
-    # Configurações específicas para PostgreSQL
-    pool_size=5,
-    max_overflow=10,
-    pool_recycle=3600,  # Recicla conexões a cada hora
-    pool_timeout=30
+    # Configurações específicas para SQLite
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 )
 
 # Cria a sessão
@@ -49,8 +44,9 @@ def init_db():
 def test_connection():
     """Testa a conexão com o banco de dados"""
     try:
+        from sqlalchemy import text
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
             print("✅ Conexão com banco de dados estabelecida com sucesso!")
             return True
     except Exception as e:

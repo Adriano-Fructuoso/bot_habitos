@@ -21,12 +21,10 @@ def main():
     # Verifica se DATABASE_URL está configurada
     database_url = os.getenv('DATABASE_URL')
     if not database_url:
-        print("❌ DATABASE_URL não configurada!")
-        print("📝 Configure a variável DATABASE_URL no arquivo .env")
-        print("💡 Exemplo: DATABASE_URL=postgresql://user:pass@host:port/db")
-        return False
+        print("📁 DATABASE_URL não configurada, usando SQLite local...")
+        database_url = "sqlite:///./habit_bot.db"
     
-    print(f"📋 DATABASE_URL configurada: {database_url[:20]}...")
+    print(f"📋 Usando banco: {database_url}")
     
     try:
         # Importa e testa a conexão

@@ -16,8 +16,8 @@ Um bot Telegram para gamificação de hábitos com persistência PostgreSQL, foc
 - **Python 3.10+**
 - **python-telegram-bot 20.7** - API do Telegram
 - **SQLAlchemy 2.0** - ORM para banco de dados
-- **PostgreSQL** - Banco de dados (Railway)
-- **psycopg2-binary** - Driver PostgreSQL
+- **SQLite** - Banco de dados local (desenvolvimento)
+- **PostgreSQL** - Banco de dados (Railway - produção)
 - **python-dotenv** - Gerenciamento de variáveis de ambiente
 
 ## 🚀 Como Rodar Localmente
@@ -54,13 +54,13 @@ nano .env
 
 **Variáveis obrigatórias:**
 - `TELEGRAM_BOT_TOKEN` - Token do seu bot Telegram (obtenha em @BotFather)
-- `DATABASE_URL` - String de conexão PostgreSQL
+- `DATABASE_URL` - String de conexão (SQLite local por padrão)
 
 ### 3. Configure o Banco de Dados
 
 ```bash
-# Inicialize o banco (cria as tabelas automaticamente)
-python -c "from db.session import engine; from models.models import Base; Base.metadata.create_all(engine)"
+# Configure o banco SQLite local
+python setup_local.py
 ```
 
 ### 4. Execute o Bot
@@ -141,7 +141,7 @@ tail -f bot.log
 | Variável | Descrição | Exemplo |
 |----------|-----------|---------|
 | `TELEGRAM_BOT_TOKEN` | Token do bot Telegram | `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz` |
-| `DATABASE_URL` | String de conexão PostgreSQL | `postgresql://user:pass@host:port/db` |
+| `DATABASE_URL` | String de conexão | `sqlite:///./habit_bot.db` (local) |
 | `LOG_LEVEL` | Nível de log (opcional) | `INFO` |
 
 ## 🎮 Sistema de Gamificação
