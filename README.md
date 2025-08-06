@@ -26,8 +26,8 @@ Um bot Telegram para gamificação de hábitos com persistência PostgreSQL, foc
 
 ```bash
 # Clone o repositório
-git clone <seu-repositorio>
-cd habit-bot
+git clone https://github.com/Adriano-Fructuoso/bot_habitos.git
+cd bot_habitos
 
 # Crie um ambiente virtual
 python -m venv venv
@@ -66,7 +66,7 @@ python -c "from db.session import engine; from models.models import Base; Base.m
 ### 4. Execute o Bot
 
 ```bash
-python bot/main.py
+python run.py
 ```
 
 ## 🚀 Deploy no Railway
@@ -96,7 +96,7 @@ O Railway detectará automaticamente que é um projeto Python e fará o deploy.
 ## 📁 Estrutura do Projeto
 
 ```
-habit-bot/
+bot_habitos/
 ├── bot/
 │   ├── main.py          # Inicialização do bot
 │   └── handlers.py      # Comandos do bot (/start, /habit)
@@ -115,6 +115,7 @@ habit-bot/
 
 - `/start` - Cadastra o usuário no sistema
 - `/habit` - Registra conclusão de um hábito e concede XP
+- `/stats` - Mostra estatísticas do usuário
 
 ## 🔧 Comandos Úteis
 
@@ -166,4 +167,4 @@ Para dúvidas ou problemas:
 
 ---
 
-**Desenvolvido com ❤️ para gamificação de hábitos** 
+**Desenvolvido com ❤️ para gamificação de hábitos**
