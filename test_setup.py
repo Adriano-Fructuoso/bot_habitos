@@ -15,16 +15,16 @@ def test_imports():
     
     try:
         # Testa imports básicos
-        from config import Config
+        from config import TELEGRAM_BOT_TOKEN, DATABASE_URL
         print("✅ Config importado com sucesso")
         
         from db.session import engine, Base
         print("✅ Database session importado com sucesso")
         
-        from models.models import User, Habit, DailyLog, Badge
+        from models.models import User, Habit, DailyLog, Badge, Streak, DailyRating, Achievement
         print("✅ Models importados com sucesso")
         
-        from utils.gamification import GamificationSystem
+        from utils.gamification import calculate_xp_earned, update_user_progress
         print("✅ Gamification system importado com sucesso")
         
         try:
@@ -48,15 +48,15 @@ def test_config():
     print("\n🔧 Testando configurações...")
     
     try:
-        from config import Config
+        from config import TELEGRAM_BOT_TOKEN, DATABASE_URL
         
         # Verifica se as variáveis estão definidas (mesmo que vazias)
-        if hasattr(Config, 'TELEGRAM_BOT_TOKEN'):
+        if TELEGRAM_BOT_TOKEN:
             print("✅ TELEGRAM_BOT_TOKEN configurado")
         else:
             print("❌ TELEGRAM_BOT_TOKEN não encontrado")
             
-        if hasattr(Config, 'DATABASE_URL'):
+        if DATABASE_URL:
             print("✅ DATABASE_URL configurado")
         else:
             print("❌ DATABASE_URL não encontrado")
@@ -72,9 +72,9 @@ def test_database_connection():
     print("\n🗄️ Testando conexão com banco...")
     
     try:
-        from config import Config
+        from config import DATABASE_URL
         
-        if not Config.DATABASE_URL:
+        if not DATABASE_URL:
             print("⚠️ DATABASE_URL não configurado - pulando teste de conexão")
             return True
             
