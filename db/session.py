@@ -18,9 +18,13 @@ if not DATABASE_URL:
 # Cria o engine do SQLAlchemy
 engine = create_engine(
     DATABASE_URL,
-    poolclass=StaticPool,
     pool_pre_ping=True,
-    echo=False  # Set to True para debug SQL
+    echo=False,  # Set to True para debug SQL
+    # Configurações específicas para PostgreSQL
+    pool_size=5,
+    max_overflow=10,
+    pool_recycle=3600,  # Recicla conexões a cada hora
+    pool_timeout=30
 )
 
 # Cria a sessão
@@ -40,4 +44,15 @@ def get_db():
 def init_db():
     """Inicializa o banco de dados criando todas as tabelas"""
     from models.models import User, Habit, DailyLog, Badge
-    Base.metadata.create_all(bind=engine) 
+    Base.metadata.create_all(bind=engine)
+
+def test_connection():
+    """Testa a conexão com o banco de dados"""
+    try:
+        with engine.connect() as conn:
+            result = conn.execute("SELECT 1")
+            print("✅ Conexão com banco de dados estabelecida com sucesso!")
+            return True
+    except Exception as e:
+        print(f"❌ Erro na conexão com banco de dados: {e}")
+        return False 
