@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: habit_db
+      POSTGRES_USER: habit_user
+      POSTGRES_PASSWORD: habit_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U habit_user -d habit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Bot principal
+  habit-bot:
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data  # Para logs e SQLite local (fallback)
+      - ./backups:/app/backups  # Para backups
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://habit_user:habit_pass@db:5432/habit_db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:

@@ -3,13 +3,13 @@
 Script para configurar o token do bot automaticamente
 """
 
-import os
+
 
 def configure_token():
     """Configura o token do bot no arquivo .env"""
-    
+
     token = "8347035109:AAEKMroTl4jrT-dZRnBF1vEb6i5ZkXMmuME"
-    
+
     # Conteúdo do arquivo .env
     env_content = f"""# Telegram Bot Configuration
 TELEGRAM_BOT_TOKEN={token}
@@ -23,14 +23,15 @@ DATABASE_URL=sqlite:///./habit_bot.db
 # Optional: Logging Level
 LOG_LEVEL=INFO
 """
-    
+
     # Escreve o arquivo .env
-    with open('.env', 'w') as f:
+    with open(".env", "w") as f:
         f.write(env_content)
-    
+
     print("✅ Token configurado com sucesso!")
     print(f"📋 Token: {token[:20]}...")
     print("📁 Arquivo .env criado/atualizado")
 
+
 if __name__ == "__main__":
-    configure_token() 
+    configure_token()

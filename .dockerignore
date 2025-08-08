@@ -1,0 +1,53 @@
+# Arquivos de desenvolvimento
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Dados locais
+data/
+*.db
+*.sqlite
+
+# Git
+.git/
+.gitignore
+
+# Documentação
+README.md
+*.md
+
+# Testes
+test_*.py
+*_test.py
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ambiente
+.env
+.env.local
+.env.example
