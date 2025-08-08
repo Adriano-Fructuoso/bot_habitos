@@ -37,10 +37,8 @@ class User(Base):
     daily_goal = Column(Integer, default=3)
     mood_rating = Column(Float, default=5.0)
     energy_rating = Column(Float, default=5.0)
-    craving_level = Column(Integer, default=0)
-    quit_smoking_date = Column(DateTime)
-    quit_weed_date = Column(DateTime)
-    coffee_limit = Column(Integer, default=3)
+    # Removido craving_level - não é mais necessário
+    # Removido coffee_limit - não é mais necessário
 
     # Relationships
     habits = relationship("Habit", back_populates="user")
@@ -68,6 +66,8 @@ class Habit(Base):
     current_streak = Column(Integer, default=0)
     longest_streak = Column(Integer, default=0)
     total_completions = Column(Integer, default=0)
+    days_of_week = Column(String(20), default="1,2,3,4,5,6,7")  # "1,2,3,4,5" (segunda=1, domingo=7)
+    time_minutes = Column(Integer, default=30)  # Tempo em minutos
 
     # Relationships
     user = relationship("User", back_populates="habits")
@@ -87,7 +87,7 @@ class DailyLog(Base):
     notes = Column(Text)
     mood_rating = Column(Float)
     energy_rating = Column(Float)
-    craving_level = Column(Integer)
+    # Removido craving_level - não é mais necessário
     date = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -149,7 +149,7 @@ class DailyRating(Base):
     date = Column(DateTime, default=datetime.utcnow)
     mood_rating = Column(Float, nullable=False)
     energy_rating = Column(Float, nullable=False)
-    craving_level = Column(Integer, default=0)
+    # Removido craving_level - não é mais necessário
     notes = Column(Text)
     goals_met = Column(Integer, default=0)
     total_goals = Column(Integer, default=0)

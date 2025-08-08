@@ -25,6 +25,22 @@ from .callbacks import (
     edit_habit_callback,
     delete_habit_callback,
     set_reminder_callback,
+    # Novos handlers para tabela de hábitos
+    toggle_complete_habit_callback,
+    confirm_selection_callback,
+    clear_selection_callback,
+    edit_habit_full_callback,
+)
+from .menu import (
+    menu_command,
+    menu_callback,
+)
+from .text import (
+    handle_text_message,
+    handle_voice_message,
+)
+from .conversation import (
+    habit_creation_handler,
 )
 
 __all__ = [
@@ -50,4 +66,12 @@ __all__ = [
     "edit_habit_callback",
     "delete_habit_callback",
     "set_reminder_callback",
+    # Menu
+    "menu_command",
+    "menu_callback",
+    # Text handlers
+    "handle_text_message",
+    "handle_voice_message",
+    # Conversation handlers
+    "habit_creation_handler",
 ]

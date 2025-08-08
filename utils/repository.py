@@ -52,7 +52,9 @@ class HabitRepository:
         name: str,
         xp_reward: int = 10,
         description: str = None,
-        category: str = "personal"
+        category: str = "personal",
+        days_of_week: str = "1,2,3,4,5,6,7",
+        time_minutes: int = 30
     ) -> Habit:
         """Cria um novo hábito"""
         try:
@@ -82,6 +84,8 @@ class HabitRepository:
                 xp_reward=xp_reward,
                 description=description,
                 category=category,
+                days_of_week=days_of_week,
+                time_minutes=time_minutes,
                 is_active=True
             )
 

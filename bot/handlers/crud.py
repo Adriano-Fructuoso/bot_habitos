@@ -11,10 +11,8 @@ from utils.repository import HabitRepository, ReminderRepository
 from utils.branding import add_branding, get_success_message_with_branding
 from utils.keyboards import (
     create_habit_edit_keyboard,
-    create_delete_confirmation_keyboard,
     create_reminder_config_keyboard,
-    create_time_keyboard,
-    create_days_keyboard,
+    create_days_of_week_keyboard,
 )
 from app_types import CallbackAction
 from .base import track_command, safe_handler

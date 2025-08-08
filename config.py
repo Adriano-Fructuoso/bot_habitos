@@ -15,6 +15,14 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///habit_bot.db")
 
 # Configurações de Gamificação
 DEFAULT_HABITS = {
+    "reading": {
+        "name": "Leitura",
+        "description": "Ler por pelo menos 20 minutos para expandir conhecimentos",
+        "category": "desenvolvimento",
+        "difficulty": "easy",
+        "xp_reward": 12,
+        "streak_bonus": 4,
+    },
     "exercise": {
         "name": "Exercício Físico",
         "description": "Praticar atividade física por pelo menos 30 minutos",
@@ -25,59 +33,19 @@ DEFAULT_HABITS = {
     },
     "meditation": {
         "name": "Meditação",
-        "description": "Meditar por 10-15 minutos",
+        "description": "Meditar por 10-15 minutos para relaxar a mente",
         "category": "mental",
         "difficulty": "easy",
         "xp_reward": 10,
         "streak_bonus": 3,
     },
-    "reading": {
-        "name": "Leitura",
-        "description": "Ler por pelo menos 20 minutos",
-        "category": "desenvolvimento",
-        "difficulty": "easy",
-        "xp_reward": 12,
-        "streak_bonus": 4,
-    },
-    "water": {
-        "name": "Beber Água",
-        "description": "Beber 2L de água por dia",
+    "cold_shower": {
+        "name": "Banho de Água Gelada",
+        "description": "Tome um banho de água gelada para aumentar energia e resistência",
         "category": "saude",
-        "difficulty": "easy",
-        "xp_reward": 8,
-        "streak_bonus": 2,
-    },
-    "sleep": {
-        "name": "Bom Sono",
-        "description": "Dormir 7-8 horas por noite",
-        "category": "saude",
-        "difficulty": "medium",
+        "difficulty": "hard",
         "xp_reward": 20,
         "streak_bonus": 8,
-    },
-    "no_smoking": {
-        "name": "Não Fumar",
-        "description": "Evitar cigarros por 24 horas",
-        "category": "saude",
-        "difficulty": "hard",
-        "xp_reward": 25,
-        "streak_bonus": 10,
-    },
-    "no_weed": {
-        "name": "Não Usar Maconha",
-        "description": "Evitar maconha por 24 horas",
-        "category": "saude",
-        "difficulty": "hard",
-        "xp_reward": 25,
-        "streak_bonus": 10,
-    },
-    "coffee_limit": {
-        "name": "Limitar Café",
-        "description": "Beber no máximo 3 xícaras de café por dia",
-        "category": "saude",
-        "difficulty": "medium",
-        "xp_reward": 12,
-        "streak_bonus": 4,
     },
 }
 
@@ -138,18 +106,18 @@ BADGES = {
         "is_rare": False,
         "xp_bonus": 150,
     },
-    "no_smoking_week": {
-        "name": "Respirando Melhor",
-        "description": "Ficou 7 dias sem fumar",
-        "icon": "🌿",
+    "exercise_week": {
+        "name": "Atleta da Semana",
+        "description": "Exercitou-se por 7 dias seguidos",
+        "icon": "🏃",
         "category": "saude",
         "is_rare": True,
         "xp_bonus": 300,
     },
-    "no_weed_week": {
-        "name": "Mente Clara",
-        "description": "Ficou 7 dias sem usar maconha",
-        "icon": "🧠",
+    "healthy_week": {
+        "name": "Semana Saudável",
+        "description": "Manteve hábitos saudáveis por 7 dias seguidos",
+        "icon": "🌱",
         "category": "saude",
         "is_rare": True,
         "xp_bonus": 300,

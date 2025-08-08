@@ -71,13 +71,9 @@ def get_or_create_user(
             user.energy_rating = 5.0
             needs_update = True
             
-        if user.craving_level is None:
-            user.craving_level = 0
-            needs_update = True
+        # Removido craving_level - não é mais necessário
             
-        if user.coffee_limit is None:
-            user.coffee_limit = 3
-            needs_update = True
+        # Removido coffee_limit - não é mais necessário
             
         if needs_update:
             db.commit()
@@ -453,7 +449,6 @@ def create_daily_rating(
     user_id: int,
     mood_rating: float,
     energy_rating: float,
-    craving_level: int = 0,
     notes: str = None,
 ):
     """Cria uma avaliação diária do usuário"""
@@ -476,7 +471,7 @@ def create_daily_rating(
         # Atualiza avaliação existente
         existing_rating.mood_rating = mood_rating
         existing_rating.energy_rating = energy_rating
-        existing_rating.craving_level = craving_level
+        # Removido craving_level - não é mais necessário
         existing_rating.notes = notes
         db.commit()
         return existing_rating
@@ -487,7 +482,7 @@ def create_daily_rating(
         user_id=user.id,
         mood_rating=mood_rating,
         energy_rating=energy_rating,
-        craving_level=craving_level,
+        # Removido craving_level - não é mais necessário
         notes=notes,
         goals_met=progress["completed"] if progress else 0,
         total_goals=progress["goal"] if progress else 0,
@@ -535,11 +530,7 @@ def get_weekly_summary(db: Session, user_id: int):
         if week_ratings
         else 0
     )
-    avg_craving = (
-        sum(r.craving_level for r in week_ratings) / len(week_ratings)
-        if week_ratings
-        else 0
-    )
+    # Removido avg_craving - não é mais necessário
 
     # Dias ativos
     active_days = len(set(log.date.date() for log in week_logs if log.completed))
@@ -551,7 +542,7 @@ def get_weekly_summary(db: Session, user_id: int):
         "active_days": active_days,
         "avg_mood": round(avg_mood, 1),
         "avg_energy": round(avg_energy, 1),
-        "avg_craving": round(avg_craving, 1),
+        # Removido avg_craving - não é mais necessário
         "week_ratings": week_ratings,
         "week_logs": week_logs,
     }
@@ -604,19 +595,148 @@ def get_daily_progress(db, user_id: int):
     # Busca logs de hoje
     logs = db.query(DailyLog).filter(
         DailyLog.user_id == user_id,
-        DailyLog.completed_at >= today
+        DailyLog.date >= today
     ).all()
     
-    completed_habits = [log.habit_id for log in logs]
+    completed_habits = [log.habit_id for log in logs if log.completed]
     total_habits = len(habits)
     completed_count = len(completed_habits)
     
     progress_percentage = (completed_count / total_habits * 100) if total_habits > 0 else 0
+    
+    # Converte hábitos para formato esperado
+    habits_data = [
+        {
+            'id': h.id,
+            'name': h.name,
+            'xp_reward': h.xp_reward,
+            'completed': h.id in completed_habits
+        }
+        for h in habits
+    ]
     
     return {
         "completed": completed_count,
         "goal": total_habits,
         "progress": progress_percentage,
         "logs": logs,
+        "habits": habits_data,
         "completed_habits": completed_habits
     }
+
+
+def get_today_habits(db, user_id: int):
+    """Busca hábitos que devem ser feitos hoje baseado nos dias de repetição"""
+    from datetime import datetime
+    
+    today = datetime.now()
+    weekday = today.weekday() + 1  # 1=Segunda, 2=Terça, ..., 7=Domingo
+    
+    # Busca hábitos ativos do usuário
+    habits = db.query(Habit).filter(
+        Habit.user_id == user_id,
+        Habit.is_active == True
+    ).all()
+    
+    today_habits = []
+    
+    for habit in habits:
+        # Verifica se o hábito deve ser feito hoje
+        days_list = [int(d.strip()) for d in habit.days_of_week.split(',')]
+        
+        if weekday in days_list:
+            # Verifica se já foi completado hoje
+            from datetime import date
+            today_date = date.today()
+            
+            completed_today = db.query(DailyLog).filter(
+                DailyLog.user_id == user_id,
+                DailyLog.habit_id == habit.id,
+                DailyLog.completed_at >= today_date
+            ).first() is not None
+            
+            today_habits.append({
+                'id': habit.id,
+                'name': habit.name,
+                'description': habit.description,
+                'xp_reward': habit.xp_reward,
+                'category': habit.category,
+                'days_of_week': habit.days_of_week,
+                'time_minutes': habit.time_minutes,
+                'current_streak': habit.current_streak,
+                'completed_today': completed_today
+            })
+    
+    return today_habits
+
+
+def complete_habit(db: Session, user_id: int, habit_id: int):
+    """Completa um hábito e retorna o resultado"""
+    from datetime import date
+    today = date.today()
+    
+    try:
+        # Busca usuário e hábito
+        db_user = db.query(User).filter(User.id == user_id).first()
+        if not db_user:
+            return {"success": False, "message": "Usuário não encontrado."}
+        
+        habit = db.query(Habit).filter(
+            Habit.id == habit_id,
+            Habit.user_id == user_id,
+            Habit.is_active == True
+        ).first()
+        
+        if not habit:
+            return {"success": False, "message": "Hábito não encontrado."}
+        
+        # Verifica se já foi completado hoje
+        existing_log = db.query(DailyLog).filter(
+            DailyLog.user_id == user_id,
+            DailyLog.habit_id == habit_id,
+            DailyLog.completed_at >= today
+        ).first()
+        
+        if existing_log:
+            return {"success": False, "message": "Este hábito já foi completado hoje!"}
+        
+        # Registra conclusão
+        xp_earned = calculate_xp_earned(habit.xp_reward, habit.current_streak)
+        
+        log = DailyLog(
+            user_id=user_id,
+            habit_id=habit_id,
+            xp_earned=xp_earned
+        )
+        db.add(log)
+        
+        # Atualiza progresso do usuário
+        update_user_progress(db, user_id, habit_id, xp_earned)
+        
+        # Atualiza streak do hábito
+        habit.current_streak += 1
+        habit.total_completions += 1
+        if habit.current_streak > habit.longest_streak:
+            habit.longest_streak = habit.current_streak
+        
+        db.commit()
+        
+        # Busca dados atualizados do usuário
+        db.refresh(db_user)
+        
+        return {
+            "success": True,
+            "message": get_motivational_message('habit_completed'),
+            "xp_earned": xp_earned,
+            "new_total_xp": db_user.total_xp_earned,
+            "new_level": db_user.current_level,
+            "habit_name": habit.name,
+            "habit_xp_reward": habit.xp_reward,
+            "current_streak": habit.current_streak,
+            "total_completions": habit.total_completions
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao completar hábito: {e}")
+        return {"success": False, "message": f"Erro interno: {str(e)}"}

@@ -31,16 +31,21 @@ from .base import track_command, safe_handler
 @track_command("start")
 async def _start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handler para o comando /start"""
-    user = update.effective_user
-    telegram_user_id = user.id
-    
-    db = next(get_db())
-    
     try:
+        print(f"🔍 /start iniciado para usuário {update.effective_user.id}")
+        
+        user = update.effective_user
+        telegram_user_id = user.id
+        
+        print(f"📝 Buscando usuário {telegram_user_id} no banco...")
+        
+        db = next(get_db())
+        
         # Busca ou cria usuário
         db_user = db.query(User).filter(User.telegram_user_id == telegram_user_id).first()
         
         if not db_user:
+            print(f"👤 Criando novo usuário {telegram_user_id}...")
             # Cria novo usuário
             db_user = User(
                 telegram_user_id=telegram_user_id,
@@ -51,13 +56,14 @@ async def _start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db.add(db_user)
             db.commit()
             db.refresh(db_user)
+            print(f"✅ Usuário criado com ID {db_user.id}")
             
             # Cria hábitos padrão
             default_habits = [
-                ("Beber água", 10, "Hidratação é fundamental!"),
-                ("Exercício físico", 15, "Mova-se pelo menos 30 minutos"),
-                ("Ler", 10, "Leia pelo menos 20 páginas"),
-                ("Meditar", 10, "Respire fundo e relaxe"),
+                ("Leitura", 12, "Leia pelo menos 20 minutos para expandir conhecimentos"),
+                ("Exercício físico", 15, "Mova-se pelo menos 30 minutos por dia"),
+                ("Meditação", 10, "Respire fundo e relaxe por 10-15 minutos"),
+                ("Banho de água gelada", 20, "Tome um banho de água gelada para aumentar energia e resistência"),
             ]
             
             for name, xp, desc in default_habits:
@@ -72,25 +78,55 @@ async def _start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             db.commit()
             
+            print("📝 Enviando mensagem de boas-vindas...")
             welcome_message = get_welcome_message()
             await update.message.reply_text(welcome_message, parse_mode="Markdown")
+            print("✅ Mensagem de boas-vindas enviada")
             
         else:
-            # Usuário já existe
+            print(f"👤 Usuário {telegram_user_id} já existe (ID: {db_user.id})")
+            # Usuário já existe - mostra menu principal
+            from utils.keyboards import create_main_menu_keyboard
+            from utils.gamification import get_daily_goal_progress
+            
+            print("📊 Buscando progresso diário...")
+            # Busca progresso diário
+            progress = get_daily_goal_progress(db, db_user.id)
+            print(f"✅ Progresso: {progress}")
+            
             message = f"""
-🤖 *Bem-vindo de volta, {user.first_name}!*
+🎉 *Bem-vindo de volta, {user.first_name}!*
 
-Use /habit para ver seus hábitos do dia.
-Use /stats para ver seu progresso.
-Use /help para ver todos os comandos.
+**📊 Seu Progresso Hoje:**
+• ✅ {progress['completed']}/{progress['goal']} hábitos completados
+• 📈 {progress['progress']:.1f}% da meta diária
+• 🏆 Nível {db_user.current_level}
+• 💎 {db_user.total_xp_earned:,} XP total
+
+**Escolha uma opção:**
 """
-            await update.message.reply_text(add_branding(message), parse_mode="Markdown")
+            
+            print("🎯 Criando menu principal...")
+            keyboard = create_main_menu_keyboard()
+            
+            print("📤 Enviando menu principal...")
+            await update.message.reply_text(
+                add_branding(message),
+                parse_mode="Markdown",
+                reply_markup=keyboard
+            )
+            print("✅ Menu principal enviado com sucesso!")
     
     except Exception as e:
+        print(f"❌ Erro no comando /start: {e}")
+        print(f"❌ Tipo de erro: {type(e).__name__}")
+        import traceback
+        print(f"❌ Traceback: {traceback.format_exc()}")
         db.rollback()
         raise e
     finally:
         db.close()
+        print("🔒 Conexão com banco fechada")
 
 
 @track_command("habit")
@@ -331,7 +367,6 @@ async def _weekly_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ⭐ **Avaliações médias**:
 • Humor: {weekly['avg_mood']}/10
 • Energia: {weekly['avg_energy']}/10
-• Craving: {weekly['avg_craving']}/10
 """
         
         await update.message.reply_text(add_branding(message), parse_mode="Markdown")
