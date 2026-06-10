@@ -41,7 +41,7 @@ pip install psycopg2-binary
 APP_ENV=production
 LOG_LEVEL=INFO
 DATABASE_URL=postgresql+psycopg2://habit_user:habit_pass@localhost:5432/habit_db
-TELEGRAM_BOT_TOKEN=8347035109:AAEKMroTl4jrT-dZRnBF1vEb6i5ZkXMmuME
+TELEGRAM_BOT_TOKEN=SEU_TOKEN_AQUI
 ```
 
 ### 5. **Migrations Executadas**
